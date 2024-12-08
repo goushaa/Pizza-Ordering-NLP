@@ -1,5 +1,4 @@
 import re
-from transformers import AutoTokenizer
 import json
 
 # Create entity and intent label mapping
