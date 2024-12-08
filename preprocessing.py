@@ -132,6 +132,23 @@ with open('PIZZA_train_10.json', 'r') as file:
                     complextopping_words.remove(token)
         return tokens, labels
 
+    # Declare global variables
+    word_to_int = {}
+    current_int = 23  # Start from 23 to avoid conflict with label_map
+
+    def tokens_to_integers(tokens):
+        global word_to_int, current_int  # Access the global variables
+        
+        # Generate integers for each unique word
+        int_tokens = []
+        for token in tokens:
+            if token not in word_to_int:
+                word_to_int[token] = current_int
+                current_int += 1
+            int_tokens.append(word_to_int[token])
+        
+        return int_tokens
+
     # Process each entry
     for entry in data:
         train_SRC = entry['train.SRC']
@@ -144,7 +161,8 @@ with open('PIZZA_train_10.json', 'r') as file:
         intent_indices = [label_map[intent] for intent in intents]
         print("Train SRC:", train_SRC)
         print("Tokens:", tokens)
-        
+        tokenized_input = tokens_to_integers(tokens = tokens)
+        print("Tokenized Input:", tokenized_input)
         print("Entites:", entites)
         print("Entity Indices:", entity_indices)
         print("Intents:", intents)
