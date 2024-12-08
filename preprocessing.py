@@ -16,8 +16,21 @@ label_map = {
     'BQUANTITY': 19, 'IQUANTITY': 20,
     'BTOPPING': 21, 'ITOPPING': 22
 }
-with open('PIZZA_train_10.json', 'r') as file:
-    data = json.load(file)
+
+# File path to the .txt file
+file_path = "PIZZA_train_10.json"
+data = []
+
+# Open the file and read it line by line
+with open(file_path, 'r') as file:
+    for line in file:
+        try:
+            # Strip whitespace and convert the line to a JSON object
+            json_data = json.loads(line.strip())
+            data.append(json_data)  # Append the JSON object to the list
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON on line: {line.strip()}")
+            print(f"Error details: {e}")
 
 def process_text(text):
     # Remove special characters and unnecessary punctuation
@@ -144,7 +157,7 @@ all_entities = []
 all_intents = []
 all_tokens_tokenized = []
 
-# Process each entry
+# # Process each entry
 for entry in data:
     train_SRC = entry['train.SRC']
     train_TOP = entry['train.TOP']
@@ -155,19 +168,17 @@ for entry in data:
     # Convert entity and intent labels to integers using label_map
     entity_indices = [label_map[entity] for entity in entities]
     intent_indices = [label_map[intent] for intent in intents]
-    print("Train SRC:", train_SRC)
-    print("Tokens:", tokens)
     tokenized_input = tokens_to_integers(tokens = tokens)
-    print("Tokenized Input:", tokenized_input)
-    print("entities:", entities)
-    print("Entity Indices:", entity_indices)
-    print("Intents:", intents)
-    print("Intent Indices:", intent_indices)
-    print()
-
-        # Append the arrays for the current entry to the containers
+    # Append the arrays for the current entry to the containers
     all_tokens.append(tokens)
     all_tokens_tokenized.append(tokenized_input)
-    all_entities.append(entities)
-    all_intents.append(intents)
+    all_entities.append(entity_indices)
+    all_intents.append(intent_indices)
 
+# print(len(all_tokens),all_tokens)
+# print("------------------------\n")
+# print(len(all_tokens_tokenized),all_tokens_tokenized)
+# print("------------------------\n")
+# print(len(all_entities),all_entities)
+# print("------------------------\n")
+# print(len(all_intents),all_intents)
