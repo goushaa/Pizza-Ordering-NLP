@@ -1,5 +1,5 @@
 import re
-import json
+from nltk.tokenize import word_tokenize
 
 label_map = {
     'NONE': 0,
@@ -16,30 +16,13 @@ label_map = {
     'BTOPPING': 21, 'ITOPPING': 22
 }
 
-def read_file(file_path):
-    data = []
-    # Open the file and read it line by line
-    with open(file_path, 'r') as file:
-        for line in file:
-            try:
-                # Strip whitespace and convert the line to a JSON object
-                json_data = json.loads(line.strip())
-                data.append(json_data)  # Append the JSON object to the list
-            except json.JSONDecodeError as e:
-                print(f"Error decoding JSON on line: {line.strip()}")
-                print(f"Error details: {e}")
-    return data
-
-# the file paths should be changed in kaggle
-train_data = read_file("train.json") 
-test_data_train = read_file("test.json")
-dev_data = read_file("PIZZA_dev.json")
-
+########################################################################################################################
 def process_text(text):
     # Remove special characters and unnecessary punctuation
     cleaned_text = re.sub(r'[^\w\s]', ' ', text).lower()
     return ' '.join(cleaned_text.split())
 
+########################################################################################################################
 def map_words_to_entities(tokens, top_text):
     # Initialize labels with 'NONE'
     entities = ['NONE'] * len(tokens)
@@ -55,7 +38,7 @@ def map_words_to_entities(tokens, top_text):
         (r'\(CONTAINERTYPE\s+([^\)]+)\)', 'CONTAINERTYPE'),
         (r'\(VOLUME\s+([^\)]+)\)', 'VOLUME'),
     ]
-    
+
     # Match each pattern and assign B/I labels
     for pattern, entity in patterns:
         matches = re.finditer(pattern, top_text)
@@ -138,26 +121,19 @@ def map_words_to_intents(tokens, top_text):
                 complextopping_words.remove(token)
     return labels
 
-# Declare global variables
-word_to_int = {}
-current_int = 0
-
-def train_tokens_to_integers(tokens):
-    global word_to_int, current_int  # Access the global variables
-    
+########################################################################################################################
+def train_tokens_to_integers(tokens, word_to_int, VOCAB_SIZE):
     # Generate integers for each unique word
     int_tokens = []
     for token in tokens:
         if token not in word_to_int:
-            word_to_int[token] = current_int
-            current_int += 1
+            word_to_int[token] = VOCAB_SIZE
+            VOCAB_SIZE += 1
         int_tokens.append(word_to_int[token])
     
-    return int_tokens
+    return int_tokens, VOCAB_SIZE
 
-def test_tokens_to_integers(tokens):
-    global word_to_int
-    
+def test_tokens_to_integers(tokens, word_to_int):
     # Generate integers for each unique word
     int_tokens = []
     for token in tokens:
@@ -167,33 +143,39 @@ def test_tokens_to_integers(tokens):
             int_tokens.append(word_to_int[token])    
     return int_tokens
 
-def preprocess_data(data,tokens_to_integers = train_tokens_to_integers,srcKey="train.SRC",topKey="train.TOP",):
-# # Process each entry
+########################################################################################################################
+def preprocess_data(data, type, srcKey, topKey, word_to_int = None): # Type: 0-->train // 1-->test
+# Process each entry
     all_tokens_tokenized = []
     all_entities = []
     all_intents = []
+
+    word_to_int = {}
+    word_to_int["<UNK>"] = 0
+    VOCAB_SIZE = 1
+    
     for entry in data:
         train_SRC = entry[srcKey]
         train_TOP = entry[topKey]
         cleaned_src = process_text(train_SRC)
-        tokens = cleaned_src.split()
+        tokens = word_tokenize(cleaned_src)
         entities = map_words_to_entities(tokens, train_TOP)
         intents = map_words_to_intents(tokens, train_TOP)
+
         # Convert entity and intent labels to integers using label_map
         entity_indices = [label_map[entity] for entity in entities]
         intent_indices = [label_map[intent] for intent in intents]
-        tokenized_input = tokens_to_integers(tokens = tokens)
+        if (type==0):
+            tokenized_input, VOCAB_SIZE = train_tokens_to_integers(tokens, word_to_int, VOCAB_SIZE)
+        else:
+            tokenized_input = test_tokens_to_integers(tokens, word_to_int)
+
         # Append the arrays for the current entry to the containers
         all_tokens_tokenized.append(tokenized_input)
         all_entities.append(entity_indices)
         all_intents.append(intent_indices)
-    return all_tokens_tokenized, all_entities, all_intents
 
-
-train_tokens_tokenized, train_entities, train_intents = preprocess_data(train_data)
-test_tokens_tokenized, test_entities, test_intents = preprocess_data(test_data_train,test_tokens_to_integers)
-dev_tokens_tokenized, dev_entities, dev_intents = preprocess_data(dev_data,test_tokens_to_integers,"dev.SRC","dev.TOP")
-
-assert len(train_tokens_tokenized) == len(train_entities) == len(train_intents), "Mismatch in training data lengths"
-assert len(test_tokens_tokenized) == len(test_entities) == len(test_intents), "Mismatch in testing data lengths"
-assert len(dev_tokens_tokenized) == len(dev_entities) == len(dev_intents), "Mismatch in development data lengths"
+    if (type==0):
+        return all_tokens_tokenized, all_entities, all_intents, word_to_int, VOCAB_SIZE
+    else:
+        return all_tokens_tokenized, all_entities, all_intents

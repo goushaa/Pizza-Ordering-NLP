@@ -1,2 +1,9 @@
 dataset
 myenv
+.conda/
+PIZZA_train
+PIZZA_dev
+train
+test
+train2
+test2
