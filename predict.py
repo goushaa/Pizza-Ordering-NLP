@@ -83,8 +83,8 @@ def get_orders(tokens, predicted_entities, predicted_intents, reverse_label_map)
 
         prev_entity = curr_entity
         curr_entity = entity_type
-        if (intent_type=='BPIZZAORDER') or (intent_type=='IPIZZAORDER'): # Pizza Order
-            if intent_type.startswith("B"):  # Beginning of a new pizza_order
+        if (intent_type=='BPIZZAORDER') or (intent_type=='IPIZZAORDER') or (intent_type=='BCOMPLEX_TOPPING') or (intent_type=='ICOMPLEX_TOPPING'): # Pizza Order
+            if intent_type=='BPIZZAORDER':  # Beginning of a new pizza_order
                 if pizza_begin_flag:
                     pizza_order = {"NUMBER": None, "SIZE": None, "STYLE": None, "AllTopping": None}
                     pizza_topping = {"NOT": False, "Quantity": None, "Topping": None}

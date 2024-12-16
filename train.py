@@ -113,8 +113,7 @@ def evaluate_model(device, model, dataloader, dataset_len):
                 if sorted(true_intents) == sorted(predicted_intents):
                     total_acc_intents += 1
 
-     # Calculate overall accuracy for entities and intents
-    print(dataset_len)
+    # Calculate overall accuracy for entities and intents
     total_em_entities /= dataset_len
     total_em_intents /= dataset_len
 

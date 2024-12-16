@@ -1,9 +1,9 @@
 import torch
-from train import train, evaluate
-from predict import predict
+from train2 import train, evaluate
+from predict2 import predict
 
-MODEL_NAME = 'blstm'
-DATA_SIZE = 1000
+MODEL_NAME = 'lstm'
+DATA_SIZE = 20000
 
 # 0 --> train // 1 --> predict
 def main(type):
@@ -29,4 +29,4 @@ def main(type):
 
 
 # 0 --> train // 1 --> evaluate dev_set // 2 --> predict a sentence
-main(0)
+main(2)
