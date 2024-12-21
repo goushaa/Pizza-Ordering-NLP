@@ -186,11 +186,11 @@ def evaluate(device, model_name, data_size):
     VOCAB_SIZE = len(word_to_int)
 
     # Remove if needed
-    test_data = read_file("./Dataset/test.json")
-    test_tokens_tokenized, test_entities, test_intents = preprocess_data(test_data, 1, "train.SRC", "train.TOP", VOCAB_SIZE, word_to_int)
-    test_dataset = PizzaDataset(test_tokens_tokenized, test_entities,test_intents, PAD)
-    test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    evaluate_model(device, model, test_dataloader, len(test_dataset))
+    # test_data = read_file("./Dataset/test.json")
+    # test_tokens_tokenized, test_entities, test_intents = preprocess_data(test_data, 1, "train.SRC", "train.TOP", VOCAB_SIZE, word_to_int)
+    # test_dataset = PizzaDataset(test_tokens_tokenized, test_entities,test_intents, PAD)
+    # test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    # evaluate_model(device, model, test_dataloader, len(test_dataset))
     
     dev_data = read_file("./Dataset/PIZZA_dev.json")
     dev_tokens_tokenized, dev_entities, dev_intents = preprocess_data(dev_data, 1, "dev.SRC", "dev.TOP", VOCAB_SIZE, word_to_int)

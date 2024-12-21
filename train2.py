@@ -107,11 +107,31 @@ def evaluate_model(device, model, dataloader, dataset_len):
     print(f'Basic Accuracy: {total_basic_acc:.4f}')
 
 
+def evaluate_submission(device, model, dataloader, dataset_len):
+    total_acc = 0
+    total_em = 0
+    total_basic_acc = 0 
+    total_tokens = 0
+
+    with torch.no_grad():
+        for tokens, outputs in tqdm(dataloader):
+            tokens, outputs = tokens.to(device), outputs.to(device)
+            
+            # Get predictions from the model
+            prediction = model(tokens)
+
+            # Predicted entities and intents
+            pred_outputs = torch.argmax(prediction, dim=-1)
+            # print("Actual:",outputs,"\n","Prediction:",pred_outputs)
+
+            # for out, pred in zip(pred_outputs,outputs)
+
+
 
 ########################################################################################################################
 def train(device, model_name, data_size):
     ################################################### READING FILES ##################################################
-    train_data = read_file("./Dataset/PIZZA_train.json", data_size)
+    train_data = read_file2("./Dataset/final_pizza_train.json")
 
     ################################################### PREPROCESSING ##################################################
     # 0-->train // 1-->test
@@ -174,17 +194,17 @@ def evaluate(device, model_name, data_size):
     VOCAB_SIZE = len(word_to_int)
 
     # Remove if needed
-    test_data = read_file("./Dataset/test.json")
-    test_tokens_tokenized, test_entities, test_intents = preprocess_data(test_data, 1, "train.SRC", "train.TOP", VOCAB_SIZE, word_to_int)
-    test_entities_dataset = PizzaDataset2(test_tokens_tokenized, test_entities, PAD)
-    test_entities_dataloader = DataLoader(test_entities_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    test_intents_dataset = PizzaDataset2(test_tokens_tokenized,test_intents, PAD)
-    test_intents_dataloader = DataLoader(test_intents_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    # test_data = read_file("./Dataset/test.json")
+    # test_tokens_tokenized, test_entities, test_intents = preprocess_data(test_data, 1, "train.SRC", "train.TOP", VOCAB_SIZE, word_to_int)
+    # test_entities_dataset = PizzaDataset2(test_tokens_tokenized, test_entities, PAD)
+    # test_entities_dataloader = DataLoader(test_entities_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    # test_intents_dataset = PizzaDataset2(test_tokens_tokenized,test_intents, PAD)
+    # test_intents_dataloader = DataLoader(test_intents_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    print("******************* EVAL ENTITIES *******************")
-    evaluate_model(device, entities_model, test_entities_dataloader, len(test_entities_dataset))
-    print("******************* EVAL INTENTS ********************")
-    evaluate_model(device, intents_model, test_intents_dataloader, len(test_intents_dataset))
+    # print("******************* EVAL ENTITIES *******************")
+    # evaluate_model(device, entities_model, test_entities_dataloader, len(test_entities_dataset))
+    # print("******************* EVAL INTENTS ********************")
+    # evaluate_model(device, intents_model, test_intents_dataloader, len(test_intents_dataset))
     
     dev_data = read_file("./Dataset/PIZZA_dev.json")
     dev_tokens_tokenized, dev_entities, dev_intents = preprocess_data(dev_data, 1, "dev.SRC", "dev.TOP", VOCAB_SIZE, word_to_int)

@@ -28,6 +28,24 @@ def read_file(file_path, num_rows=1000000):
     # Return the specified number of rows
     return data[:num_rows]
 
+
+def read_file2(file_path):
+    data = []
+    
+    # Open the file and read it line by line
+    with open(file_path, 'r') as file:
+        for line in file:
+            try:
+                # Strip whitespace and convert the line to a JSON object
+                json_data = json.loads(line.strip())
+                data.append(json_data)  # Append the JSON object to the list
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON on line: {line.strip()}")
+                print(f"Error details: {e}")
+
+    # Return the specified number of rows
+    return data
+
 # Create a dataset class
 class PizzaDataset(Dataset):
     def __init__(self, tokens, entities,intents, pad_idx):

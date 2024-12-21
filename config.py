@@ -8,7 +8,7 @@ BATCH_SIZE = 5
 DROPOUT = 0.4
 PAD = 1
 LABELS_SIZE = 24
-ENTITIES_LABELS_SIZE = 18
+ENTITIES_LABELS_SIZE = 19
 INTENTS_LABELS_SIZE = 7
 
 label_map = {
@@ -34,9 +34,10 @@ entities_label_map = {
     'BCONTAINERTYPE': 7, 'ICONTAINERTYPE': 8,
     'BDRINKTYPE': 9, 'IDRINKTYPE': 10,
     'BSTYLE': 11, 'ISTYLE': 12,
-    'BQUANTITY': 13, 'IQUANTITY': 14,
-    'BTOPPING': 15, 'ITOPPING': 16, 
-    'NOT': 17
+    'STYLE_NOT': 13,
+    'BQUANTITY': 14, 'IQUANTITY': 15,
+    'BTOPPING': 16, 'ITOPPING': 17, 
+    'TOPPING_NOT': 18
 }
 intents_label_map = {
     'NONE': 0,

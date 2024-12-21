@@ -22,7 +22,8 @@ def map_words_to_entities(tokens, top_text):
         (r'\(DRINKTYPE\s+([^\)]+)\)', 'DRINKTYPE'),
         (r'\(CONTAINERTYPE\s+([^\)]+)\)', 'CONTAINERTYPE'),
         (r'\(VOLUME\s+([^\)]+)\)', 'VOLUME'),
-        (r'\b(no)\s\(NOT', 'NOT'),
+        (r'\(NOT\s\(TOPPING\s+([^\)]+)\)', 'TOPPING_NOT'),  # Fix
+        (r'\(NOT\s\(STYLE\s+([^\)]+)\)', 'STYLE_NOT'),# Fix
     ]
 
     # Match each pattern and assign B/I labels
@@ -36,14 +37,14 @@ def map_words_to_entities(tokens, top_text):
             for i, token in enumerate(tokens):
                 if token in value_tokens:
                     if not entity_started:  # Beginning of the entity
-                        if entity == 'NOT':
+                        if entity == 'TOPPING_NOT' or entity == 'STYLE_NOT':
                             entities[i] = f'{entity}'
                         else:
                             entities[i] = f'B{entity}'
                         entity_started = True
                         value_tokens.remove(token)  # Avoid duplicate matches
                     else:  # Continuation of the entity
-                        if entity == 'NOT':
+                        if entity == 'TOPPING_NOT' or entity == 'STYLE_NOT':
                             entities[i] = f'{entity}'
                         else:
                             entities[i] = f'I{entity}'
